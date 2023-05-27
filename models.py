@@ -15,8 +15,10 @@ class SQLCertificate(db.Model):
     name = db.Column(db.String(255), unique=False, nullable=False)
     description = db.Column(db.String(255), unique=False, nullable=True)
     expiration = db.Column(db.Integer, unique=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+    # created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime)
+    # updated_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(db.DateTime(timezone=True))
     expirated_at = db.Column(db.DateTime(timezone=True))
     groups = db.relationship('SQLGroup', secondary=cartificate_group, backref=db.backref('certificados', lazy='dynamic'))
 

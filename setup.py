@@ -1,8 +1,8 @@
 from app import db
-from repos_cert import SQLCertificateRepo
-from repos_group import SQLGroupRepo
-from usecases_cert import CertificateUC
-from usecases_group import GroupUC
+from cert.repos import SQLCertificateRepo
+from group.repos import SQLGroupRepo
+from cert.usecases import CertificateUC
+from group.usecases import GroupUC
 
 cert_repo = SQLCertificateRepo(db=db)
 cert_uc = CertificateUC(repo=cert_repo)

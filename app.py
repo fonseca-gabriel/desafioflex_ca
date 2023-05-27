@@ -9,7 +9,7 @@ db = SQLAlchemy(app)
 app.app_context().push()
 
 if __name__ == '__main__':
-    from apis_cert import *
-    from apis_group import *
+    from cert.apis import *
+    from group.apis import *
     db.create_all()
     app.run(debug=True)
