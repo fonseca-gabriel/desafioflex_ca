@@ -4,8 +4,9 @@ from entities import Certificate
 
 
 class SQLCertificateRepo:
-    def __init__(self, db):
+    def __init__(self, db, group_repo):
         self.db = db
+        self.group_repo = group_repo
 
     def get_all(self, modifiers):
         print("### cert / repos / get_all")
@@ -41,15 +42,21 @@ class SQLCertificateRepo:
             )
             certs.append(cert)
 
-        # certificates = db_certs.all()
-        # certs_list = CertificateSchema(many=True).dump(certificates)
-
-        # return 200, certs_list
         return 200, certs
 
     def insert(self, cert):
         print("### cert / repos / insert")
         print(f"cert.groups: {cert.groups}")
+
+        # preciso converter os grupos em objetos do tipo SQLGroup
+        db_groups = []
+        for group in cert.groups:
+            status, group_sql = self.group_repo.get_db_group_by_id(group)
+            if status == 404:
+                return 400, f"Erro, grupo {group} não existe"
+            db_groups.append(group_sql)
+
+        print(f"db_groups: {db_groups}")
 
         db_certificate = SQLCertificate(
             username=cert.username,
@@ -57,7 +64,9 @@ class SQLCertificateRepo:
             description=cert.description,
             expiration=cert.expiration,
             expirated_at=cert.expirated_at,
-            groups=cert.groups,
+            groups=db_groups,
+            created_at=cert.created_at,
+            updated_at=cert.updated_at
         )
         print(f"db_certificate: {db_certificate}")
         self.db.session.add(db_certificate)

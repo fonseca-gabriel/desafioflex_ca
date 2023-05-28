@@ -63,14 +63,10 @@ class CertificateUC:
 
         groups_id = []
         for group_id in cert_dict["groups"]:
-            status, obj = self.group_uc.get_by_id(group_id)
+            status, group_ent = self.group_uc.get_by_id(group_id)
             if status == 404:
-                return 400, "Erro"
-            groups_id.append(obj)
-
-        print(f"groups_id: {groups_id}")
-
-        # isso ta errado, groups_id deve ser um objeto SQLGroup e não de Group
+                return 400, f"Erro, grupo com ID {group_id} não existe"
+            groups_id.append(group_ent.id)
 
         cert_ent = Certificate(
             id=None,
@@ -83,8 +79,6 @@ class CertificateUC:
             expirated_at=define_expirated_at(cert_dict["expiration"]),
             groups=groups_id
         )
-        print(f"cert_ent: {cert_ent}")
-        print(f"cert_ent.groups: {cert_ent.groups}")
 
         return self.repo.insert(cert_ent)
 

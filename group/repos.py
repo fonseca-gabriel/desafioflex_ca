@@ -27,6 +27,8 @@ class SQLGroupRepo:
         print("### group / repos / insert")
         db_group = SQLGroup(
             name=group.name,
+            created_at=group.created_at,
+            updated_at=group.updated_at,
         )
 
         self.db.session.add(db_group)
@@ -82,3 +84,11 @@ class SQLGroupRepo:
         self.db.session.commit()
 
         return 200, group_ent
+
+    def get_db_group_by_id(self, group_id):
+        print("### group / repos / get_db_group_by_id")
+        group_query = self.db.session.get(SQLGroup, group_id)
+        if group_query:
+            return 200, group_query
+
+        return 404, None
