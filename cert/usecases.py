@@ -83,16 +83,16 @@ class CertificateUC:
         return self.repo.insert(cert_ent)
 
     def get_by_id(self, cert_id):
-        status, cert_exists = self.repo.get_by_id(cert_id)
+        print("### cert / usecases / get_by_id")
+        status, cert_ent = self.repo.get_by_id(cert_id)
 
         if status == 404:
             return 404, None
 
-        cert = Certificate(username=cert_exists.username, id=cert_exists.id)
-        return 200, cert
+        return 200, cert_ent
 
     def delete(self, cert_id):
-        status, cert_exists = self.repo.get_by_id(cert_id)
+        status, cert_ent = self.repo.get_by_id(cert_id)
 
         if status == 404:
             return 404, None
@@ -100,13 +100,29 @@ class CertificateUC:
         return self.repo.delete(cert_id)
 
     def update(self, cert_id, data):
-        cert_dict = CertificateSchema().load(data)
+        print("### cert / usecases / update")
 
-        # Verifica se o username já existe
-        status, username_existis = self.repo.get_by_username(cert_dict["username"])
+        # Adicionar aqui um try/except
+        cert_dict = CertificateSchema(partial=True).load(data)
+
+        # # Verifica se o username já existe
+        # status, username_existis = self.repo.get_by_username(cert_dict["username"])
+        # if status == 200:
+        #     return 409, None
+
+        status, cert_ent = self.repo.get_by_id(cert_id)
+
         if status == 200:
-            return 409, None
+            if cert_dict.get("name"):
+                cert_ent.name = cert_dict.get("name")
+            if cert_dict.get("description"):
+                cert_ent.description = cert_dict.get("description")
+            if cert_dict.get("groups"):
+                cert_ent.groups = cert_dict.get("groups")
+            cert_ent.updates_at = datetime.now()
 
-        cert = Certificate(username=cert_dict["username"], id=None)
-        return self.repo.update(cert_id, cert)
+            return self.repo.update(cert_id, cert_ent)
+
+        return 409, None
+
 

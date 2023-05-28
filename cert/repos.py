@@ -37,20 +37,19 @@ class SQLCertificateRepo:
                 expiration=db_cert.expiration,
                 expirated_at=db_cert.expirated_at,
                 description=db_cert.description,
-                # groups=db_cert.groups,
                 groups=[db_cert.id for db_cert in db_certs.first().groups],
             )
             certs.append(cert)
 
         return 200, certs
 
-    def insert(self, cert):
+    def insert(self, cert_ent):
         print("### cert / repos / insert")
-        print(f"cert.groups: {cert.groups}")
+        print(f"cert_ent.groups: {cert_ent.groups}")
 
         # preciso converter os grupos em objetos do tipo SQLGroup
         db_groups = []
-        for group in cert.groups:
+        for group in cert_ent.groups:
             status, group_sql = self.group_repo.get_db_group_by_id(group)
             if status == 404:
                 return 400, f"Erro, grupo {group} não existe"
@@ -59,14 +58,14 @@ class SQLCertificateRepo:
         print(f"db_groups: {db_groups}")
 
         db_certificate = SQLCertificate(
-            username=cert.username,
-            name=cert.name,
-            description=cert.description,
-            expiration=cert.expiration,
-            expirated_at=cert.expirated_at,
+            username=cert_ent.username,
+            name=cert_ent.name,
+            description=cert_ent.description,
+            expiration=cert_ent.expiration,
+            expirated_at=cert_ent.expirated_at,
             groups=db_groups,
-            created_at=cert.created_at,
-            updated_at=cert.updated_at
+            created_at=cert_ent.created_at,
+            updated_at=cert_ent.updated_at
         )
         print(f"db_certificate: {db_certificate}")
         self.db.session.add(db_certificate)
@@ -86,7 +85,18 @@ class SQLCertificateRepo:
         print("### cert / repos / get_by_id")
         cert_query = self.db.session.get(SQLCertificate, cert_id)
         if cert_query:
-            return 200, cert_query
+            cert_ent = Certificate(
+                id=cert_query.id,
+                username=cert_query.username,
+                name=cert_query.name,
+                description=cert_query.description,
+                expiration=cert_query.expiration,
+                expirated_at=cert_query.expirated_at,
+                groups=[group.id for group in cert_query.groups],
+                created_at=cert_query.created_at,
+                updated_at=cert_query.updated_at
+            )
+            return 200, cert_ent
         return 404, None
 
     def delete(self, cert_id):
@@ -100,13 +110,24 @@ class SQLCertificateRepo:
 
         return 404, False
 
-    def update(self, cert_id, cert):
+    def update(self, cert_id, cert_ent):
         print("### cert / repos / update")
 
+        db_groups = []
+        for group in cert_ent.groups:
+            status, group_sql = self.group_repo.get_db_group_by_id(group)
+            if status == 404:
+                return 404, f"Erro, grupo {group} não existe"
+            db_groups.append(group_sql)
+
         cert_query = self.db.session.get(SQLCertificate, cert_id)
-        cert_query.username = cert.username
+        if cert_ent.name:
+            cert_query.name = cert_ent.name
+        if cert_ent.description:
+            cert_query.description = cert_ent.description
+        if cert_ent.groups:
+            cert_query.groups = db_groups  # aqui preciso informar objs SQLGroup
 
         self.db.session.commit()
 
-        certificate_serialized = CertificateSchema().dump(cert_query)
-        return 200, certificate_serialized
+        return 200, cert_ent

@@ -18,8 +18,8 @@ def get_all_groups():
 
 
 @app.route('/grupos', methods=['POST'])
-def create():
-    print("### group / apis / create")
+def create_group():
+    print("### group / apis / create_group")
     status, group_ent = group_uc.create(request.json)
     if status == 200:
         return jsonify(group_ent.json()), status
@@ -31,8 +31,8 @@ def create():
 
 
 @app.route('/grupos/<int:group_id>', methods=['GET'])
-def get_by_id(group_id):
-    print("### group / apis / get_by_id")
+def get_group_by_id(group_id):
+    print("### group / apis / get_group_by_id")
     status, group_ent = group_uc.get_by_id(group_id)
 
     if status == 200:
@@ -52,7 +52,7 @@ def delete(group_id):
 
 
 @app.route('/grupos/<int:group_id>', methods=['PUT'])
-def update(group_id):
+def update_group(group_id):
     print("### group / apis / update")
     status, group_ent = group_uc.update(group_id, request.json)
     if status == 200:
