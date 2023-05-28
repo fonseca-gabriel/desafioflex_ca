@@ -4,8 +4,8 @@ from setup import group_uc
 
 
 @app.route('/grupos', methods=['GET'])
-def get_all():
-    print("### group / apis / get_all")
+def get_all_groups():
+    print("### group / apis / get_all_groups")
     status, groups = group_uc.get_all()
 
     if status == 200:

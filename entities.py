@@ -10,6 +10,19 @@ class Certificate:
         self.expirated_at = expirated_at
         self.groups = groups
 
+    def json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "username": self.username,
+            "description": self.description,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "expiration": self.expiration,
+            "expirated_at": self.expirated_at,
+            "groups": self.groups,
+        }
+
 
 class Group:
     def __init__(self, id, name, created_at, updated_at):

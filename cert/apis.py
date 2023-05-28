@@ -4,15 +4,22 @@ from setup import cert_uc
 
 
 @app.route('/certificados', methods=['GET'])
-def list_certificates():
-
+def get_all_certs():
+    print("### cert / apis / get_all_certs")
     modifiers = {}
     modifiers["sort_param"] = request.args.get('sort')
     modifiers["filter_name_param"] = request.args.get('name')
     modifiers["filter_username_param"] = request.args.get('username')
 
     status, certs = cert_uc.get_all(modifiers)
-    return jsonify(certs), status
+
+    if status == 200:
+        certs_list = []
+        for cert in certs:
+            certs_list.append(cert.json())
+        return jsonify(certs_list), status
+
+    return "Erro", status
 
 
 @app.route('/certificados', methods=['POST'])

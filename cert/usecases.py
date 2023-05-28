@@ -2,7 +2,6 @@ from marshmallow import fields, Schema, ValidationError
 from marshmallow.validate import Length, And, Regexp, Range
 from entities import Certificate
 from datetime import datetime, timedelta
-from models import SQLGroup  # remover depois
 
 
 class CertificateSchema(Schema):
@@ -42,14 +41,16 @@ def define_expirated_at(expiration):
 
 
 class CertificateUC:
-    def __init__(self, repo):
+    def __init__(self, repo, group_uc):
         self.repo = repo
-        # self.grou_uc = group_uc
+        self.group_uc = group_uc
 
     def get_all(self, modifiers):
+        print("### cert / usecases / get_all")
         return self.repo.get_all(modifiers)
 
     def create(self, data):
+        print("### cert / usecases / create")
         try:
             cert_dict = CertificateSchema().load(data)
         except ValidationError as err:
@@ -60,27 +61,32 @@ class CertificateUC:
         if status == 200:
             return 409, None
 
-        # for group_id in cert_dict["groups"]:
-        #     staus, obj = self.group_uc.get_by_id(group_id)
-        #     if status == 404:
-        #         return 400, "Erro"
+        groups_id = []
+        for group_id in cert_dict["groups"]:
+            status, obj = self.group_uc.get_by_id(group_id)
+            if status == 404:
+                return 400, "Erro"
+            groups_id.append(obj)
 
-        group_ids = [int(group_id) for group_id in cert_dict["groups"]]
-        groups = SQLGroup.query.filter(SQLGroup.id.in_(group_ids)).all()  # ajustar, não deve ser usar SQL aqui
+        print(f"groups_id: {groups_id}")
 
-        cert_dict["id"] = None
-        cert_dict["created_at"] = None
-        cert_dict["updated_at"] = None
-        cert_dict["expirated_at"] = define_expirated_at(cert_dict["expiration"])
-        cert_dict["groups"] = groups
-        # cert = Certificate(**cert_dict)
+        # isso ta errado, groups_id deve ser um objeto SQLGroup e não de Group
 
-        cert = Certificate(
-            # id=None,
+        cert_ent = Certificate(
+            id=None,
             created_at=datetime.now(),
+            updated_at=datetime.now(),
+            username=cert_dict["username"],
+            name=cert_dict["name"],
+            description=cert_dict["description"],
+            expiration=cert_dict["expiration"],
+            expirated_at=define_expirated_at(cert_dict["expiration"]),
+            groups=groups_id
         )
+        print(f"cert_ent: {cert_ent}")
+        print(f"cert_ent.groups: {cert_ent.groups}")
 
-        return self.repo.insert(cert)
+        return self.repo.insert(cert_ent)
 
     def get_by_id(self, cert_id):
         status, cert_exists = self.repo.get_by_id(cert_id)

@@ -1,4 +1,4 @@
-from group.usecases import GroupSchema
+# from group.usecases import GroupSchema
 from models import SQLGroup
 from entities import Group
 
@@ -10,6 +10,7 @@ class SQLGroupRepo:
     def get_all(self):
         print("### group / repos / get_all")
         db_groups = SQLGroup.query.all()
+
         groups = []
         for db_group in db_groups:
             group = Group(

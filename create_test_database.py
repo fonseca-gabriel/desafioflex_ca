@@ -28,6 +28,8 @@ exp3 = 60
 exp4 = 15
 
 cert1 = SQLCertificate(
+    created_at=datetime.utcnow(),
+    updated_at=datetime.utcnow(),
     username="joao",
     name="João Silva",
     description="JS",
@@ -37,6 +39,8 @@ cert1 = SQLCertificate(
 )
 
 cert2 = SQLCertificate(
+    created_at=datetime.utcnow(),
+    updated_at=datetime.utcnow(),
     username="pedro",
     name="Pedro Souza",
     description="PS",
@@ -46,6 +50,8 @@ cert2 = SQLCertificate(
 )
 
 cert3 = SQLCertificate(
+    created_at=datetime.utcnow(),
+    updated_at=datetime.utcnow(),
     username="maria",
     name="Maria Oliveira",
     description="MO",
@@ -55,6 +61,8 @@ cert3 = SQLCertificate(
 )
 
 cert4 = SQLCertificate(
+    created_at=datetime.utcnow(),
+    updated_at=datetime.utcnow(),
     username="joana",
     name="Joana Rodrigues",
     description="JR",
