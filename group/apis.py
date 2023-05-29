@@ -20,7 +20,8 @@ def get_all_groups():
 @app.route('/grupos', methods=['POST'])
 def create_group():
     print("### group / apis / create_group")
-    status, group_ent = group_uc.create(request.json)
+    print(f"type(request.json): {type(request.json)}")
+    status, group_ent = group_uc.create(request.json)  # todo: enviar Group()?
     if status == 200:
         return jsonify(group_ent.json()), status
     elif status == 400:

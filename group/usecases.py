@@ -63,7 +63,10 @@ class GroupUC:
 
     def update(self, group_id, data):
         print("### group / usecases / update")
-        group_dict = GroupSchema().load(data)
+        try:
+            group_dict = GroupSchema().load(data)
+        except ValidationError as err:
+            return 400, err.messages
 
         # Verifica se o name já existe
         status, group = self.repo.get_by_name(group_dict["name"])

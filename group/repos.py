@@ -23,19 +23,20 @@ class SQLGroupRepo:
 
         return 200, groups
 
-    def insert(self, group):
+    def insert(self, group_ent):
         print("### group / repos / insert")
         db_group = SQLGroup(
-            name=group.name,
-            created_at=group.created_at,
-            updated_at=group.updated_at,
+            name=group_ent.name,
+            created_at=group_ent.created_at,
+            updated_at=group_ent.updated_at,
         )
 
         self.db.session.add(db_group)
         self.db.session.commit()
-        group.id = db_group.id
+        group_ent.id = db_group.id
 
-        return 200, group
+        print(f"type(group): {type(group_ent)}")
+        return 200, group_ent
 
     def get_by_name(self, group):
         print("### group / repos / get_by_name")

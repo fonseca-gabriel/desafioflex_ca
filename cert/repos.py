@@ -47,15 +47,12 @@ class SQLCertificateRepo:
         print("### cert / repos / insert")
         print(f"cert_ent.groups: {cert_ent.groups}")
 
-        # preciso converter os grupos em objetos do tipo SQLGroup
         db_groups = []
         for group in cert_ent.groups:
             status, group_sql = self.group_repo.get_db_group_by_id(group)
             if status == 404:
                 return 400, f"Erro, grupo {group} não existe"
             db_groups.append(group_sql)
-
-        print(f"db_groups: {db_groups}")
 
         db_certificate = SQLCertificate(
             username=cert_ent.username,
@@ -67,12 +64,11 @@ class SQLCertificateRepo:
             created_at=cert_ent.created_at,
             updated_at=cert_ent.updated_at
         )
-        print(f"db_certificate: {db_certificate}")
+
         self.db.session.add(db_certificate)
         self.db.session.commit()
 
-        certificate_serialized = CertificateSchema().dump(db_certificate)
-        return 200, certificate_serialized
+        return 200, cert_ent
 
     def get_by_username(self, cert):
         print("### cert / repos / get_by_username")

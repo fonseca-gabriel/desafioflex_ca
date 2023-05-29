@@ -25,11 +25,11 @@ def get_all_certs():
 @app.route('/certificados', methods=['POST'])
 def create_certificate():
     print("### group / apis / create_certificate")
-    status, cert = cert_uc.create(request.json)
+    status, cert_ent = cert_uc.create(request.json)
     if status == 200:
-        return jsonify(cert), status
+        return jsonify(cert_ent.json()), status
     elif status == 400:
-        return jsonify({"message": cert}), status
+        return jsonify(cert_ent.json()), status
 
     return jsonify({'message': 'username already exists.'}), status
 
