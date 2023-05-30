@@ -1,4 +1,3 @@
-# from group.usecases import GroupSchema
 from models import SQLGroup
 from entities import Group
 

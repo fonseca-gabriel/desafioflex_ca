@@ -1,4 +1,3 @@
-from cert.usecases import CertificateSchema
 from models import SQLCertificate
 from entities import Certificate
 

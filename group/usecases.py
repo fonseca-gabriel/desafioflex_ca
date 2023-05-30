@@ -30,8 +30,7 @@ class GroupUC:
         except ValidationError as err:
             return 400, err.messages
 
-        # Verifica se o name já existe
-        status, group_ent = self.repo.get_by_name(group_dict["name"])
+        status, group_ent = self.repo.get_by_name(group_dict.get("name"))
         if status == 200:
             return 409, None
 
@@ -39,7 +38,7 @@ class GroupUC:
             id=None,
             created_at=datetime.now(),
             updated_at=datetime.now(),
-            name=group_dict["name"],
+            name=group_dict.get("name"),
         )
 
         return self.repo.insert(group)
@@ -54,6 +53,7 @@ class GroupUC:
         return 200, group_ent
 
     def delete(self, group_id):
+        print("### group / usecases / delete")
         status, group_exists = self.repo.get_by_id(group_id)
 
         if status == 404:
@@ -68,15 +68,14 @@ class GroupUC:
         except ValidationError as err:
             return 400, err.messages
 
-        # Verifica se o name já existe
-        status, group = self.repo.get_by_name(group_dict["name"])
+        status, group = self.repo.get_by_name(group_dict.get("name"))
         if status == 200:
             return 409, None
 
         status, group_ent = self.repo.get_by_id(group_id)
 
         if status == 200:
-            group_ent.name = group_dict["name"]
+            group_ent.name = group_dict.get("name")
             group_ent.updates_at = datetime.now()
             return self.repo.update(group_id, group_ent)
 

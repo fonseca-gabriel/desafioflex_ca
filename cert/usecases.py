@@ -1,7 +1,7 @@
+from datetime import datetime, timedelta
 from marshmallow import fields, Schema, ValidationError
 from marshmallow.validate import Length, And, Regexp, Range
 from entities import Certificate
-from datetime import datetime, timedelta
 
 
 class CertificateSchema(Schema):
@@ -56,13 +56,12 @@ class CertificateUC:
         except ValidationError as err:
             return 400, err.messages
 
-        # Verifica se o username já existe
-        status, username_existis = self.repo.get_by_username(cert_dict["username"])
+        status, username_existis = self.repo.get_by_username(cert_dict.get("username"))
         if status == 200:
             return 409, None
 
         groups_id = []
-        for group_id in cert_dict["groups"]:
+        for group_id in cert_dict.get("groups"):
             status, group_ent = self.group_uc.get_by_id(group_id)
             if status == 404:
                 return 400, f"Erro, grupo com ID {group_id} não existe"
@@ -72,11 +71,11 @@ class CertificateUC:
             id=None,
             created_at=datetime.now(),
             updated_at=datetime.now(),
-            username=cert_dict["username"],
-            name=cert_dict["name"],
-            description=cert_dict["description"],
-            expiration=cert_dict["expiration"],
-            expirated_at=define_expirated_at(cert_dict["expiration"]),
+            username=cert_dict.get("username"),
+            name=cert_dict.get("name"),
+            description=cert_dict.get("description"),
+            expiration=cert_dict.get("expiration"),
+            expirated_at=define_expirated_at(cert_dict.get("expiration")),
             groups=groups_id
         )
 
@@ -102,13 +101,10 @@ class CertificateUC:
     def update(self, cert_id, data):
         print("### cert / usecases / update")
 
-        # Adicionar aqui um try/except
-        cert_dict = CertificateSchema(partial=True).load(data)
-
-        # # Verifica se o username já existe
-        # status, username_existis = self.repo.get_by_username(cert_dict["username"])
-        # if status == 200:
-        #     return 409, None
+        try:
+            cert_dict = CertificateSchema(partial=True).load(data)
+        except ValidationError as err:
+            return 400, err.messages
 
         status, cert_ent = self.repo.get_by_id(cert_id)
 

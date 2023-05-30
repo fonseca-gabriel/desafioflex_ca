@@ -1,4 +1,4 @@
-from flask import request, jsonify, make_response
+from flask import request, jsonify
 from app import app
 from setup import cert_uc
 
@@ -49,9 +49,9 @@ def get_certificate_by_id(cert_id):
 def delete_certificate(cert_id):
     status, cert = cert_uc.delete(cert_id)
     if status == 200:
-        return make_response(jsonify({'message': 'certificate deleted'}), 200)
+        return jsonify({'message': 'certificate deleted'}), 200
 
-    return make_response(jsonify({'message': 'certificate not found'}), 404)
+    return jsonify({'message': 'certificate not found'}), 404
 
 
 @app.route('/certificados/<int:cert_id>', methods=['PUT'])

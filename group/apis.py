@@ -1,4 +1,4 @@
-from flask import request, jsonify, make_response
+from flask import request, jsonify
 from app import app
 from setup import group_uc
 
@@ -21,12 +21,11 @@ def get_all_groups():
 def create_group():
     print("### group / apis / create_group")
     print(f"type(request.json): {type(request.json)}")
-    status, group_ent = group_uc.create(request.json)  # todo: enviar Group()?
+    status, group_ent = group_uc.create(request.json)
     if status == 200:
         return jsonify(group_ent.json()), status
     elif status == 400:
-        err = group_ent
-        return jsonify(err), status
+        return jsonify(group_ent), status
 
     return jsonify({'message': 'username already exists.'}), status
 
@@ -47,9 +46,9 @@ def delete(group_id):
     print("### group / apis / delete")
     status, group_ent = group_uc.delete(group_id)
     if status == 200:
-        return make_response(jsonify({'message': 'group deleted'}), 200)
+        return jsonify({'message': 'group deleted'}), 200
 
-    return make_response(jsonify({'message': 'group not found'}), 404)
+    return jsonify({'message': 'group not found'}), 404
 
 
 @app.route('/grupos/<int:group_id>', methods=['PUT'])
