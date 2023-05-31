@@ -23,16 +23,18 @@ class GroupUC:
         print("### group / usecases / get_all")
         return self.repo.get_all()
 
-    def create(self, data):
+    def create(self, group_data):
         print("### group / usecases / create")
         try:
-            group_dict = GroupSchema().load(data)
+            group_dict = GroupSchema().load(group_data)
         except ValidationError as err:
             return 400, err.messages
 
         status, group_ent = self.repo.get_by_name(group_dict.get("name"))
         if status == 200:
             return 409, None
+        if status == 400:
+            return 404, f"Group with name {group_dict.get('name')} not found"
 
         group = Group(
             id=None,
@@ -48,7 +50,7 @@ class GroupUC:
         status, group_ent = self.repo.get_by_id(group_id)
 
         if status == 404:
-            return 404, None
+            return 404, f"Group with ID {group_id} not found"
 
         return 200, group_ent
 
@@ -61,16 +63,12 @@ class GroupUC:
 
         return self.repo.delete(group_id)
 
-    def update(self, group_id, data):
+    def update(self, group_id, gourp_data):
         print("### group / usecases / update")
         try:
-            group_dict = GroupSchema().load(data)
+            group_dict = GroupSchema().load(gourp_data)
         except ValidationError as err:
             return 400, err.messages
-
-        status, group = self.repo.get_by_name(group_dict.get("name"))
-        if status == 200:
-            return 409, None
 
         status, group_ent = self.repo.get_by_id(group_id)
 
@@ -79,4 +77,4 @@ class GroupUC:
             group_ent.updates_at = datetime.now()
             return self.repo.update(group_id, group_ent)
 
-        return 409, None
+        return 404, f"Group with ID {group_id} not found"

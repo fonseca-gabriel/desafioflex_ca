@@ -57,7 +57,7 @@ def update_group(group_id):
     status, group_ent = group_uc.update(group_id, request.json)
     if status == 200:
         return jsonify(group_ent.json()), status
+    # elif status == 400:
+    #     return jsonify(group_ent), status
 
-    return jsonify({'message': 'username already exists.'}), status
-
-
+    return jsonify(group_ent), status

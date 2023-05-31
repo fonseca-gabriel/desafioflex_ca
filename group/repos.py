@@ -10,17 +10,17 @@ class SQLGroupRepo:
         print("### group / repos / get_all")
         db_groups = SQLGroup.query.all()
 
-        groups = []
+        groups_ent_list = []
         for db_group in db_groups:
-            group = Group(
+            group_ent = Group(
                 id=db_group.id,
                 name=db_group.name,
                 created_at=db_group.created_at,
                 updated_at=db_group.updated_at
             )
-            groups.append(group)
+            groups_ent_list.append(group_ent)
 
-        return 200, groups
+        return 200, groups_ent_list
 
     def insert(self, group_ent):
         print("### group / repos / insert")
@@ -34,12 +34,11 @@ class SQLGroupRepo:
         self.db.session.commit()
         group_ent.id = db_group.id
 
-        print(f"type(group): {type(group_ent)}")
         return 200, group_ent
 
-    def get_by_name(self, group):
+    def get_by_name(self, group_name):
         print("### group / repos / get_by_name")
-        db_group = SQLGroup.query.filter_by(name=group).first()
+        db_group = SQLGroup.query.filter_by(name=group_name).first()
         if db_group:
             group_ent = Group(
                 id=db_group.id,
@@ -48,17 +47,17 @@ class SQLGroupRepo:
                 updated_at=db_group.updated_at,
             )
             return 200, group_ent
-        return 400, None
+        return 404, None
 
     def get_by_id(self, group_id):
         print("### group / repos / get_by_id")
-        group_query = self.db.session.get(SQLGroup, group_id)
-        if group_query:
+        db_group = self.db.session.get(SQLGroup, group_id)
+        if db_group:
             group_ent = Group(
-                id=group_query.id,
-                name=group_query.name,
-                created_at=group_query.created_at,
-                updated_at=group_query.updated_at,
+                id=db_group.id,
+                name=db_group.name,
+                created_at=db_group.created_at,
+                updated_at=db_group.updated_at,
             )
             return 200, group_ent
 
@@ -66,10 +65,10 @@ class SQLGroupRepo:
 
     def delete(self, group_id):
         print("### group / repos / delete")
-        group_query = self.db.session.get(SQLGroup, group_id)
+        db_group = self.db.session.get(SQLGroup, group_id)
 
-        if group_query:
-            self.db.session.delete(group_query)
+        if db_group:
+            self.db.session.delete(db_group)
             self.db.session.commit()
             return 200, True
 
@@ -77,18 +76,15 @@ class SQLGroupRepo:
 
     def update(self, group_id, group_ent):
         print("### group / repos / update")
-
-        group_query = self.db.session.get(SQLGroup, group_id)
-        group_query.name = group_ent.name
-
+        db_group = self.db.session.get(SQLGroup, group_id)
+        db_group.name = group_ent.name
         self.db.session.commit()
-
         return 200, group_ent
 
     def get_db_group_by_id(self, group_id):
         print("### group / repos / get_db_group_by_id")
-        group_query = self.db.session.get(SQLGroup, group_id)
-        if group_query:
-            return 200, group_query
+        db_group = self.db.session.get(SQLGroup, group_id)
+        if db_group:
+            return 200, db_group
 
         return 404, None

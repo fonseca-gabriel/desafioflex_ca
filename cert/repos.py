@@ -25,7 +25,7 @@ class SQLCertificateRepo:
                     SQLCertificate.username.ilike(f'%{modifiers.get("filter_username_param")}%')
                 )
 
-        certs = []
+        certs_ent_list = []
         for db_cert in db_certs:
             cert = Certificate(
                 id=db_cert.id,
@@ -38,19 +38,18 @@ class SQLCertificateRepo:
                 description=db_cert.description,
                 groups=[db_cert.id for db_cert in db_certs.first().groups],
             )
-            certs.append(cert)
+            certs_ent_list.append(cert)
 
-        return 200, certs
+        return 200, certs_ent_list
 
     def insert(self, cert_ent):
         print("### cert / repos / insert")
-        print(f"cert_ent.groups: {cert_ent.groups}")
 
         db_groups = []
         for group in cert_ent.groups:
             status, group_sql = self.group_repo.get_db_group_by_id(group)
             if status == 404:
-                return 400, f"Erro, grupo {group} não existe"
+                return 404, group
             db_groups.append(group_sql)
 
         db_certificate = SQLCertificate(
@@ -67,29 +66,42 @@ class SQLCertificateRepo:
         self.db.session.add(db_certificate)
         self.db.session.commit()
 
+        cert_ent.id = db_certificate.id
+
         return 200, cert_ent
 
-    def get_by_username(self, cert):
+    def get_by_username(self, cert_name):
         print("### cert / repos / get_by_username")
-        cert_query = SQLCertificate.query.filter_by(username=cert).first()
-        if cert_query:
-            return 200, cert_query
-        return 400, None
+        cert_db = SQLCertificate.query.filter_by(username=cert_name).first()
+        if cert_db:
+            cert_ent = Certificate(
+                id=cert_db.id,
+                username=cert_db.username,
+                name=cert_db.name,
+                description=cert_db.description,
+                expiration=cert_db.expiration,
+                expirated_at=cert_db.expirated_at,
+                groups=[group.id for group in cert_db.groups],
+                created_at=cert_db.created_at,
+                updated_at=cert_db.updated_at
+            )
+            return 200, cert_ent
+        return 404, f"Certificate with name {cert_name} not found"
 
     def get_by_id(self, cert_id):
         print("### cert / repos / get_by_id")
-        cert_query = self.db.session.get(SQLCertificate, cert_id)
-        if cert_query:
+        cert_db = self.db.session.get(SQLCertificate, cert_id)
+        if cert_db:
             cert_ent = Certificate(
-                id=cert_query.id,
-                username=cert_query.username,
-                name=cert_query.name,
-                description=cert_query.description,
-                expiration=cert_query.expiration,
-                expirated_at=cert_query.expirated_at,
-                groups=[group.id for group in cert_query.groups],
-                created_at=cert_query.created_at,
-                updated_at=cert_query.updated_at
+                id=cert_db.id,
+                username=cert_db.username,
+                name=cert_db.name,
+                description=cert_db.description,
+                expiration=cert_db.expiration,
+                expirated_at=cert_db.expirated_at,
+                groups=[group.id for group in cert_db.groups],
+                created_at=cert_db.created_at,
+                updated_at=cert_db.updated_at
             )
             return 200, cert_ent
         return 404, None
@@ -121,7 +133,7 @@ class SQLCertificateRepo:
         if cert_ent.description:
             cert_query.description = cert_ent.description
         if cert_ent.groups:
-            cert_query.groups = db_groups  # aqui preciso informar objs SQLGroup
+            cert_query.groups = db_groups
 
         self.db.session.commit()
 

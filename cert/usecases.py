@@ -49,14 +49,14 @@ class CertificateUC:
         print("### cert / usecases / get_all")
         return self.repo.get_all(modifiers)
 
-    def create(self, data):
+    def create(self, cert_data):
         print("### cert / usecases / create")
         try:
-            cert_dict = CertificateSchema().load(data)
+            cert_dict = CertificateSchema().load(cert_data)
         except ValidationError as err:
             return 400, err.messages
 
-        status, username_existis = self.repo.get_by_username(cert_dict.get("username"))
+        status, cert_ent_or_error = self.repo.get_by_username(cert_dict.get("username"))
         if status == 200:
             return 409, None
 
@@ -79,10 +79,15 @@ class CertificateUC:
             groups=groups_id
         )
 
-        return self.repo.insert(cert_ent)
+        status, cert_ent_inserted_or_error = self.repo.insert(cert_ent)
+        if status == 404:
+            return status, f"Erro, grupo {cert_ent_inserted_or_error} não existe"
+
+        return status, cert_ent
 
     def get_by_id(self, cert_id):
         print("### cert / usecases / get_by_id")
+
         status, cert_ent = self.repo.get_by_id(cert_id)
 
         if status == 404:
@@ -98,11 +103,11 @@ class CertificateUC:
 
         return self.repo.delete(cert_id)
 
-    def update(self, cert_id, data):
+    def update(self, cert_id, cert_data):
         print("### cert / usecases / update")
 
         try:
-            cert_dict = CertificateSchema(partial=True).load(data)
+            cert_dict = CertificateSchema(partial=True).load(cert_data)
         except ValidationError as err:
             return 400, err.messages
 

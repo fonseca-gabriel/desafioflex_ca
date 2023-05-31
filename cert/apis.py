@@ -26,10 +26,13 @@ def get_all_certs():
 def create_certificate():
     print("### group / apis / create_certificate")
     status, cert_ent = cert_uc.create(request.json)
+    print(f"cert_ent: {cert_ent}")
     if status == 200:
+        print(f"status: {status}")
         return jsonify(cert_ent.json()), status
     elif status == 400:
-        return jsonify(cert_ent.json()), status
+        print(f"status: {status}")
+        return jsonify(cert_ent), status
 
     return jsonify({'message': 'username already exists.'}), status
 
@@ -37,6 +40,7 @@ def create_certificate():
 @app.route('/certificados/<int:cert_id>', methods=['GET'])
 def get_certificate_by_id(cert_id):
     print("### group / apis / get_certificate_by_id")
+
     status, cert_ent = cert_uc.get_by_id(cert_id)
 
     if status == 200:
@@ -63,6 +67,6 @@ def update_certificate(cert_id):
     elif status == 404:
         return cert_ent, 404
 
-    return jsonify({'message': 'username already exists.'}), status
+    return jsonify(cert_ent), status
 
 
