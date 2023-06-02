@@ -113,6 +113,9 @@ class CertificateUC:
 
         status, cert_ent = self.repo.get_by_id(cert_id)
 
+        if status == 404:
+            return 404, f"certificado com ID {cert_id} não existe"
+
         if status == 200:
             if cert_dict.get("name"):
                 cert_ent.name = cert_dict.get("name")
@@ -122,7 +125,11 @@ class CertificateUC:
                 cert_ent.groups = cert_dict.get("groups")
             cert_ent.updates_at = datetime.now()
 
-            return self.repo.update(cert_id, cert_ent)
+            status, cert_ent_or_error = self.repo.update(cert_id, cert_ent)
+            if status == 404:
+                return 404, f"grupo {cert_ent_or_error} não existe"
+
+            return status, cert_ent
 
         return 409, None
 

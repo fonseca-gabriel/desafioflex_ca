@@ -32,7 +32,7 @@ def create_certificate():
         return jsonify(cert_ent.json()), status
     elif status == 400:
         print(f"status: {status}")
-        return jsonify(cert_ent), status
+        return jsonify({'message': cert_ent}), status
 
     return jsonify({'message': 'username already exists.'}), status
 
@@ -65,7 +65,9 @@ def update_certificate(cert_id):
     if status == 200:
         return jsonify(cert_ent.json()), status
     elif status == 404:
-        return cert_ent, 404
+        return jsonify({'message': cert_ent}), 404
+    elif status == 409:
+        print(status, cert_ent)
 
     return jsonify(cert_ent), status
 

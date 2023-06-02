@@ -86,7 +86,7 @@ class SQLCertificateRepo:
                 updated_at=cert_db.updated_at
             )
             return 200, cert_ent
-        return 404, f"Certificate with name {cert_name} not found"
+        return 404, None
 
     def get_by_id(self, cert_id):
         print("### cert / repos / get_by_id")
@@ -124,7 +124,7 @@ class SQLCertificateRepo:
         for group in cert_ent.groups:
             status, group_sql = self.group_repo.get_db_group_by_id(group)
             if status == 404:
-                return 404, f"Erro, grupo {group} não existe"
+                return 404, group
             db_groups.append(group_sql)
 
         cert_query = self.db.session.get(SQLCertificate, cert_id)

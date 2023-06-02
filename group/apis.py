@@ -14,13 +14,13 @@ def get_all_groups():
             groups_list.append(group.json())
         return jsonify(groups_list), status
 
-    return "Erro", status
+    return jsonify({'message': 'unknown error'}), status
 
 
 @app.route('/grupos', methods=['POST'])
 def create_group():
     print("### group / apis / create_group")
-    print(f"type(request.json): {type(request.json)}")
+
     status, group_ent = group_uc.create(request.json)
     if status == 200:
         return jsonify(group_ent.json()), status
@@ -57,7 +57,9 @@ def update_group(group_id):
     status, group_ent = group_uc.update(group_id, request.json)
     if status == 200:
         return jsonify(group_ent.json()), status
-    # elif status == 400:
-    #     return jsonify(group_ent), status
+    elif status == 400:
+        return jsonify(group_ent), status
+    elif status == 404:
+        return jsonify({'message': group_ent}), status
 
-    return jsonify(group_ent), status
+    return jsonify({'message': 'unknown error'}), status
