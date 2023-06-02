@@ -68,3 +68,9 @@ CREATE TABLE certificate_group (
         FOREIGN KEY(group_id) REFERENCES groups (id)
 );
 ```
+
+## Observações
+
+- Estou considerando que o atributo groups da entidade Certificate irá receber apenas inteiros das requisições.
+- Na atualização do certificado, estou considerando que somente o nome, a descrição e os grupos podem ser alterados.
+- Na atualização do grupo, estou considerando que somente a descrição pode ser alterada.
