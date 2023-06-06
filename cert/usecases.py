@@ -83,6 +83,8 @@ class CertificateUC:
         if status == 404:
             return status, f"Erro, grupo {cert_ent_inserted_or_error} não existe"
 
+        # Adicionar chamada para infra aqui
+
         return status, cert_ent
 
     def get_by_id(self, cert_id):
@@ -100,6 +102,8 @@ class CertificateUC:
 
         if status == 404:
             return 404, None
+
+        # Adicionar chamada para infra aqui
 
         return self.repo.delete(cert_id)
 
