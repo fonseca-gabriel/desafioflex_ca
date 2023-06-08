@@ -10,8 +10,11 @@ create.add_argument('--server', '-s', dest='server', required=True, help='nome d
 create.add_argument('--username', '-u', dest='username', required=True, help='usuario do certificado')
 create.add_argument('--expiration', '-e', dest='expiration', required=True, type=int, help='tempo de expiração, em dias')
 
-# list_all = subparsers.add_parser('list-all', help='list-all help')
-# list_all.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
+show = subparsers.add_parser('show', help='show help')
+show.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
+show.add_argument('--all', '-a', dest='all', required=True, help='todos')
+show.add_argument('--valids', '-v', dest='valids', required=True, help='válidos')
+show.add_argument('--revokeds', '-r', dest='revokeds', required=True, help='revogados')
 
 revoke = subparsers.add_parser('revoke', help='revoke help')
 revoke.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
