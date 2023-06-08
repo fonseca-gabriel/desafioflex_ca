@@ -2,23 +2,25 @@ from argparse import ArgumentParser
 from infra import CertInfra
 import re
 
-parser = ArgumentParser(description='Gerenciamento dos certificados de VPN', epilog='Text at the bottom of help')
-subparsers = parser.add_subparsers(dest='command')
 
-create = subparsers.add_parser('create', help='create help')
-create.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
-create.add_argument('--username', '-u', dest='username', required=True, help='usuario do certificado')
-create.add_argument('--expiration', '-e', dest='expiration', required=True, type=int, help='tempo de expiração, em dias')
+def parse_args():
+    parser = ArgumentParser(description='Gerenciamento dos certificados de VPN', epilog='Text at the bottom of help')
+    subparsers = parser.add_subparsers(dest='command')
 
-revoke = subparsers.add_parser('revoke', help='revoke help')
-revoke.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
-revoke.add_argument('--username', '-u', dest='username', required=True, help='usuario do certificado')
+    create = subparsers.add_parser('create', help='create help')
+    create.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
+    create.add_argument('--username', '-u', dest='username', required=True, help='usuario do certificado')
+    create.add_argument('--expiration', '-e', dest='expiration', required=True, type=int, help='tempo de expiração, em dias')
 
-show = subparsers.add_parser('show', help='show help')
-show.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
-show.add_argument('--type', '-t', dest='type', choices=['all', 'valid', 'revoked'], required=True, help='tipo')
+    revoke = subparsers.add_parser('revoke', help='revoke help')
+    revoke.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
+    revoke.add_argument('--username', '-u', dest='username', required=True, help='usuario do certificado')
 
-args = parser.parse_args()
+    show = subparsers.add_parser('show', help='show help')
+    show.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
+    show.add_argument('--type', '-t', dest='type', choices=['all', 'valid', 'revoked'], required=True, help='tipo')
+
+    return parser.parse_args()
 
 
 def create_cert(server, username, expiration):
@@ -100,12 +102,12 @@ def show_certs(server, type):
         return print_certs(revoked_certs)
 
 
-if args.command == 'create':
-    create_cert(args.server, args.username, args.expiration)
-elif args.command == 'revoke':
-    revoke_cert(args.server, args.username)
-elif args.command == 'show':
-    show_certs(args.server, args.type)
+if __name__ == "__main__":
+    args = parse_args()
 
-
-
+    if args.command == 'create':
+        create_cert(args.server, args.username, args.expiration)
+    elif args.command == 'revoke':
+        revoke_cert(args.server, args.username)
+    elif args.command == 'show':
+        show_certs(args.server, args.type)
