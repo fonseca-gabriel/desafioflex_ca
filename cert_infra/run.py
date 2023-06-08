@@ -10,28 +10,15 @@ create.add_argument('--server', '-s', dest='server', required=True, help='nome d
 create.add_argument('--username', '-u', dest='username', required=True, help='usuario do certificado')
 create.add_argument('--expiration', '-e', dest='expiration', required=True, type=int, help='tempo de expiração, em dias')
 
-show = subparsers.add_parser('show', help='show help')
-show.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
-show.add_argument('--all', '-a', dest='all', required=True, help='todos')
-show.add_argument('--valids', '-v', dest='valids', required=True, help='válidos')
-show.add_argument('--revokeds', '-r', dest='revokeds', required=True, help='revogados')
-
 revoke = subparsers.add_parser('revoke', help='revoke help')
 revoke.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
 revoke.add_argument('--username', '-u', dest='username', required=True, help='usuario do certificado')
 
+show = subparsers.add_parser('show', help='show help')
+show.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
+show.add_argument('--type', '-t', dest='type', choices=['all', 'valid', 'revoked'], required=True, help='tipo')
+
 args = parser.parse_args()
-
-
-# def list_all_certs(server):
-#     print(f"args.server: {server}")
-#     status, certs = cert_uc.get_all(None)
-#
-#     if status == 200:
-#         for cert in certs:
-#             print(cert.json())
-#     else:
-#         print("Erro", status)
 
 
 def create_cert(server, username, expiration):
@@ -69,13 +56,60 @@ def revoke_cert(server, username):
     return print(f"Erro ao revogar o certificado (exit code: {returncode}):\n{cmd_stdout}")
 
 
+def print_certs(certs):
+    print("status\tdate_expiration\tdate_expirated\tserial\tname")
+    for cert in certs:
+        status = None
+        if cert.get('status') == 'V':
+            status = 'Válido'
+        elif cert.get('status') == 'R':
+            status = 'Revogado'
+        print(status + '\t', end='')
+        print(cert.get('date_expiration') + '\t', end='')
+        print(cert.get('date_expirated') + '\t', end='')
+        print(cert.get('serial') + '\t', end='')
+        print(cert.get('name') + '\t', end='\n')
+
+
+def show_certs(server, type):
+    index_file = f"{CertInfra.openvpn_path}/{server}/easy-rsa/pki/index.txt"
+
+    with open(index_file) as f:
+        lines = f.readlines()
+
+    valid_certs = []
+    revoked_certs = []
+    all_certs = []
+
+    for line in lines:
+        splited = line.split('\t')
+        cert_dict = {
+            "status": splited[0],
+            "date_expiration": splited[1],
+            "date_expirated": splited[2],
+            "serial": splited[3],
+            "name": splited[5][4:-1],
+        }
+        all_certs.append(cert_dict)
+        if splited[0] == 'V':
+            valid_certs.append(cert_dict)
+        elif splited[0] == 'R':
+            revoked_certs.append(cert_dict)
+
+    if type == 'all':
+        return print_certs(all_certs)
+    elif type == 'valid':
+        return print_certs(valid_certs)
+    elif type == 'revoked':
+        return print_certs(revoked_certs)
+
+
 if args.command == 'create':
     create_cert(args.server, args.username, args.expiration)
 elif args.command == 'revoke':
     revoke_cert(args.server, args.username)
-# elif args.command == 'list-all':
-#     if args.server:
-#         list_all_certs(args.server)
+elif args.command == 'show':
+    show_certs(args.server, args.type)
 
 
 
