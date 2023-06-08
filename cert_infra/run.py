@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
-import sys
 from infra import CertInfra
+import re
 
 parser = ArgumentParser(description='Gerenciamento dos certificados de VPN', epilog='Text at the bottom of help')
 subparsers = parser.add_subparsers(dest='command')
@@ -32,6 +32,24 @@ args = parser.parse_args()
 
 
 def create_cert(server, username, expiration):
+
+    pattern = r'^[a-zA-Z0-9]+$'
+    if not re.match(pattern, username):
+        return print("the username must only contain alphanumeric characters")
+
+    if len(username) > 30:
+        return print('the username must not exceed 30 characters')
+
+    # existing_certificate = Certificate.query.filter_by(username=username).first()
+    # if existing_certificate:
+    #     return make_response(jsonify({'message': 'username already exists.'}), 400)
+
+    if isinstance(expiration, int):
+        if expiration > 3650 or expiration < 10:
+            return print('the expiration field must be an integer between 10 and 3650')
+    else:
+        return print('the expiration field must be an integer')
+
     cert = CertInfra()
     status, returncode, cmd_stdout = cert.create_cert(server_name='server', cert_name=username, cert_expiration=expiration)
     if status:
