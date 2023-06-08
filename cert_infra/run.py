@@ -30,10 +30,6 @@ def create_cert(server, username, expiration):
     if len(username) > 30:
         return print('the username must not exceed 30 characters')
 
-    # existing_certificate = Certificate.query.filter_by(username=username).first()
-    # if existing_certificate:
-    #     return make_response(jsonify({'message': 'username already exists.'}), 400)
-
     if isinstance(expiration, int):
         if expiration > 3650 or expiration < 10:
             return print('the expiration field must be an integer between 10 and 3650')
@@ -41,7 +37,7 @@ def create_cert(server, username, expiration):
         return print('the expiration field must be an integer')
 
     cert = CertInfra()
-    status, returncode, cmd_stdout = cert.create_cert(server_name='server', cert_name=username, cert_expiration=expiration)
+    status, returncode, cmd_stdout = cert.create_cert(server_name=server, cert_name=username, cert_expiration=expiration)
     if status:
         return print(f"Certificado {username} criado com sucesso.")
     return print(f"Erro ao criar o certificado (exit code: {returncode}):\n{cmd_stdout}")
@@ -49,7 +45,7 @@ def create_cert(server, username, expiration):
 
 def revoke_cert(server, username):
     cert = CertInfra()
-    status, returncode, cmd_stdout = cert.revoke_cert(server_name='server', cert_name=username)
+    status, returncode, cmd_stdout = cert.revoke_cert(server_name=server, cert_name=username)
 
     if status:
         return print(f"Certificado {username} revogado com sucesso.")
