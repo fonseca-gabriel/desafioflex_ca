@@ -91,7 +91,8 @@ class CertificateUC:
             cert_expiration=cert_ent.expiration
         )
 
-        # todo: tratar retornos da infra
+        if not infra_status:
+            return 400, f"Erro: {infra_returncode}: {infra_msg}"  # todo: revisar
 
         return status, cert_ent
 
@@ -117,7 +118,8 @@ class CertificateUC:
             cert_name=cert_ent.username
         )
 
-        # todo: tratar retornos da infra
+        if not infra_status:
+            return 400, f"Erro: {infra_returncode}: {infra_msg}"  # todo: revisar
 
         return self.repo.delete(cert_id)
 
