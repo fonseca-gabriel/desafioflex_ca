@@ -87,7 +87,7 @@ Para obter informações de ajuda de cada uma das opções, basta executar o com
 
 ### Listagem de certificados
 
-É possível listar os certificados existentes, diretamente do arquivo de banco de dados (index.txt) da VPN, através da opção `show`.
+É possível listar os certificados existentes, diretamente do arquivo de banco de dados (index.txt) da VPN, através da opção **show**.
 
 São três as possibilidades de listagem, em todas elas é necessário informar o nome do servidor através do argumento `--server [nome-do-servidor]`:
 

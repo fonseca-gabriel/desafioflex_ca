@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from marshmallow import fields, Schema, ValidationError
 from marshmallow.validate import Length, And, Regexp, Range
 from entities import Certificate
+from cert_infra.infra import CertInfra
 
 
 class CertificateSchema(Schema):
@@ -83,7 +84,14 @@ class CertificateUC:
         if status == 404:
             return status, f"Erro, grupo {cert_ent_inserted_or_error} não existe"
 
-        # Adicionar chamada para infra aqui
+        cert_infa = CertInfra()
+        infra_status, infra_returncode, infra_msg = cert_infa.create_cert(
+            server_name='server',  # código incial não previa nome do servir, mantido fixo
+            cert_name=cert_ent.username,
+            cert_expiration=cert_ent.expiration
+        )
+
+        # todo: tratar retornos da infra
 
         return status, cert_ent
 
@@ -103,7 +111,13 @@ class CertificateUC:
         if status == 404:
             return 404, None
 
-        # Adicionar chamada para infra aqui
+        cert_infa = CertInfra()
+        infra_status, infra_returncode, infra_msg = cert_infa.revoke_cert(
+            server_name='server',  # código incial não previa nome do servir, mantido fixo
+            cert_name=cert_ent.username
+        )
+
+        # todo: tratar retornos da infra
 
         return self.repo.delete(cert_id)
 
