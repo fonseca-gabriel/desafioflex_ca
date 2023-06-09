@@ -69,6 +69,50 @@ CREATE TABLE certificate_group (
 );
 ```
 
+## Execução em CLI
+
+O arquivo `cert_infra/run.py` é responsável pelo gerenciamento dos certificados via CLI, interagindo diretamente com o sistema operacional, sem qualquer relação com as informações presentes no banco de dados.
+
+Através do comando `python run.py -h` é possível obter as informações de ajuda para execução.
+
+O comando permite a criação, revogação e listagem dos certificados, para isso utiliza-se dos seguintes argumentos posicionais:
+
+- **create**
+- **revoke**
+- **show**
+
+Para obter informações de ajuda de cada uma das opções, basta executar o comando `python run.py [opção] -h`, conforme o exemplo que segue:
+
+```python run.py create -h```
+
+### Listagem de certificados
+
+É possível listar os certificados existentes, diretamente do arquivo de banco de dados (index.txt) da VPN, através da opção `show`.
+
+São três as possibilidades de listagem, em todas elas é necessário informar o nome do servidor através do argumento `--server [nome-do-servidor]`:
+
+- **all**: lista todos os certificados do servidor informado
+- **valid**: lista somente os certificados válidos do servidor informado
+- **revoked**: lista somente os certificados revogados do servidor informado
+
+O uso da opção em questão se dá da seguinte forma:
+
+ ```python run.py show --server [nome-do-servidor] --type [opcao-de-listagem]```
+
+
+### Criação de certificados
+
+A criação de novos certificados se utiliza da opção **create**, da seguinte forma:
+
+```python run.py create --server [nome-do-servidor] --username [username-do-certificado] --expiration [validade-em-dias]```
+
+### Revogação de certificado
+
+A criação de novos certificados se utiliza da opção **revoke**, da seguinte forma:
+
+```python run.py revoke --server [nome-do-servidor] --username [username-do-certificado]```
+
+
 ## Observações
 
 - Estou considerando que o atributo groups da entidade Certificate irá receber apenas inteiros das requisições.

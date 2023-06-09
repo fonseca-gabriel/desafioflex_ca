@@ -4,19 +4,19 @@ import re
 
 
 def parse_args():
-    parser = ArgumentParser(description='Gerenciamento dos certificados de VPN', epilog='Text at the bottom of help')
+    parser = ArgumentParser(description='Gerenciamento dos certificados VPN')
     subparsers = parser.add_subparsers(dest='command')
 
-    create = subparsers.add_parser('create', help='create help')
+    create = subparsers.add_parser('create', help='cria um novo certificado')
     create.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
     create.add_argument('--username', '-u', dest='username', required=True, help='usuario do certificado')
     create.add_argument('--expiration', '-e', dest='expiration', required=True, type=int, help='tempo de expiração, em dias')
 
-    revoke = subparsers.add_parser('revoke', help='revoke help')
+    revoke = subparsers.add_parser('revoke', help='revoga um certificado')
     revoke.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
     revoke.add_argument('--username', '-u', dest='username', required=True, help='usuario do certificado')
 
-    show = subparsers.add_parser('show', help='show help')
+    show = subparsers.add_parser('show', help='lista os certificados')
     show.add_argument('--server', '-s', dest='server', required=True, help='nome do servidor')
     show.add_argument('--type', '-t', dest='type', choices=['all', 'valid', 'revoked'], required=True, help='tipo')
 
@@ -27,16 +27,16 @@ def create_cert(server, username, expiration):
 
     pattern = r'^[a-zA-Z0-9]+$'
     if not re.match(pattern, username):
-        return print("the username must only contain alphanumeric characters")
+        return print("o username deve conter apenas caracteres alfanuméricos")
 
     if len(username) > 30:
-        return print('the username must not exceed 30 characters')
+        return print('o username não dece exceder 30 caracteres')
 
     if isinstance(expiration, int):
         if expiration > 3650 or expiration < 10:
-            return print('the expiration field must be an integer between 10 and 3650')
+            return print('o campo expiration deve ser um inteiro entre 10 e 3650')
     else:
-        return print('the expiration field must be an integer')
+        return print('o campo expiration deve ser um inteiro')
 
     cert = CertInfra()
     status, returncode, cmd_stdout = cert.create_cert(server_name=server, cert_name=username, cert_expiration=expiration)
